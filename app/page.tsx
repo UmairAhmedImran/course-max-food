@@ -1,5 +1,5 @@
-import { AuthButton } from '@/components/auth-button';
-import { ThemeSwitcher } from '@/components/theme-switcher';
+import { AuthButton } from '@/modules/auth/ui/components/auth-button';
+import { ThemeSwitcher } from '@/modules/auth/ui/components/theme-switcher';
 import Image from 'next/image';
 
 import { Suspense } from 'react';
