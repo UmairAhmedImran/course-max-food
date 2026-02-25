@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { Suspense } from 'react';
 
-export function Page() {
+export default function Page() {
   return (
     <>
       <div className='flex p-4 bg-[#E7E7E7]'>
@@ -37,5 +37,3 @@ export function Page() {
     </>
   );
 }
-
-export default Page;
