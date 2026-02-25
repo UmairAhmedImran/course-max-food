@@ -5,10 +5,12 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 export const CourseList = () => {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(
-    trpc.hello.queryOptions({ text: 'Umair' }),
+    trpc.courses.getAll.queryOptions(),
   );
 
   return (
-    <div>{JSON.stringify(data.greeting, null, 2)}</div>
+    <>
+      <div>{JSON.stringify(data, null, 2)}</div>
+    </>
   );
 };

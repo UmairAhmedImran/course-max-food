@@ -1,4 +1,5 @@
-import { initTRPC } from '@trpc/server';
+import { createClient } from '@/lib/supabase/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 import { cache } from 'react';
 export const createTRPCContext = cache(async () => {
   /**
@@ -20,3 +21,18 @@ const t = initTRPC.create({
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
+export const protectedProcedure = baseProcedure.use(
+  async ({ ctx, next }) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getClaims();
+
+    if (error || !data?.claims) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'UNAUTHORIZED',
+      });
+    }
+
+    return next({ ctx: { ...ctx, auth: data.claims } });
+  },
+);
