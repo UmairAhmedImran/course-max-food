@@ -7,12 +7,19 @@ import {
 import { ErrorBoundary } from 'react-error-boundary';
 import { CourseListHeader } from '@/modules/courses/ui/components/course-list-header';
 import { CourseList } from '@/modules/courses/ui/views/course-list';
+import { createClient } from '@/lib/supabase/server';
 
-export default function ProtectedPage() {
+export default async function ProtectedPage() {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(
-    trpc.courses.getAll.queryOptions(),
-  );
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    void queryClient.prefetchQuery(
+      trpc.courses.getAll.queryOptions({ limit: 5, page: 1 }),
+    );
+  }
   return (
     <>
       <CourseListHeader />

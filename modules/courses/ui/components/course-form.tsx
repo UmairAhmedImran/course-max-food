@@ -49,26 +49,26 @@ export const CourseForm = ({
     }),
   );
 
-  //   const updateCourse = useMutation(
-  //     trpc.agents.update.mutationOptions({
-  //       onSuccess: async () => {
-  //         await queryClient.invalidateQueries(
-  //           trpc.agents.getMany.queryOptions({}),
-  //         );
-  //         if (initialValues?.id) {
-  //           await queryClient.invalidateQueries(
-  //             trpc.agents.getOne.queryOptions({
-  //               id: initialValues.id,
-  //             }),
-  //           );
-  //         }
-  //         onSucess?.();
-  //       },
-  //       onError: (error) => {
-  //         toast.error(error.message);
-  //       },
-  //     }),
-  //   );
+  const updateCourse = useMutation(
+    trpc.courses.update.mutationOptions({
+      onSuccess: async (_, variables) => {
+        await queryClient.invalidateQueries(
+          trpc.courses.getAll.queryOptions(),
+        );
+        if (variables.id) {
+          await queryClient.invalidateQueries(
+            trpc.courses.getOne.queryOptions({
+              id: variables.id,
+            }),
+          );
+        }
+        onSucess?.();
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const form = useForm<z.infer<typeof courseInsertSchema>>({
     resolver: zodResolver(courseInsertSchema),
@@ -79,10 +79,18 @@ export const CourseForm = ({
   });
 
   const isEdit = !!initialValues?.id;
-  const isPending = createCourse.isPending;
+  const isPending =
+    createCourse.isPending || updateCourse.isPending;
 
   const onSubmit = (values: z.infer<typeof courseInsertSchema>) => {
-    createCourse.mutate(values);
+    if (isEdit && initialValues?.id) {
+      updateCourse.mutate({
+        ...values,
+        id: initialValues.id,
+      });
+    } else {
+      createCourse.mutate(values);
+    }
   };
 
   return (
